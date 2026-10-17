@@ -1,0 +1,73 @@
+services:
+  users:
+    build: .
+    command: ["node", "dist/users/server.js"]
+    environment:
+      PORT: "4101"
+      JWT_SECRET: demo-only-not-a-secret
+    ports:
+      - "4101:4101"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4101/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+
+  orders:
+    build: .
+    command: ["node", "dist/orders/server.js"]
+    environment:
+      PORT: "4102"
+      JWT_SECRET: demo-only-not-a-secret
+      WEBHOOK_TOKEN: demo-webhook-token
+      WEBHOOK_URL: http://gateway:4100/demo/webhooks/orders
+    ports:
+      - "4102:4102"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4102/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 5s
+
+  gateway:
+    build: .
+    command: ["node", "dist/gateway/server.js"]
+    environment:
+      PORT: "4100"
+      JWT_SECRET: demo-only-not-a-secret
+      WEBHOOK_TOKEN: demo-webhook-token
+      USERS_URL: http://users:4101/graphql
+      ORDERS_URL: http://orders:4102/graphql
+    ports:
+      - "4100:4100"
+    depends_on:
+      users:
+        condition: service_healthy
+      orders:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4100/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+      start_period: 10s

@@ -1,0 +1,49 @@
+{
+  "name": "graphql-federation-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Apollo Federation 2 portfolio demo: users and orders subgraphs behind a composing gateway.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/dev.ts",
+    "start": "node dist/dev.js",
+    "start:users": "node dist/users/server.js",
+    "start:orders": "node dist/orders/server.js",
+    "start:gateway": "node dist/gateway/server.js",
+    "compose": "tsx src/compose-check.ts",
+    "lint": "eslint . && tsc --noEmit",
+    "test": "vitest run",
+    "token": "tsx src/token-cli.ts"
+  },
+  "dependencies": {
+    "@apollo/composition": "2.14.4",
+    "@apollo/gateway": "2.14.4",
+    "@apollo/server": "5.5.1",
+    "@apollo/subgraph": "2.15.1",
+    "@as-integrations/express4": "1.1.2",
+    "@graphql-tools/utils": "12.1.0",
+    "cors": "2.8.6",
+    "dataloader": "2.2.3",
+    "express": "4.22.3",
+    "graphql": "16.14.2",
+    "graphql-depth-limit": "1.1.0",
+    "graphql-query-complexity": "2.0.0",
+    "jsonwebtoken": "9.0.3"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.19",
+    "@types/express": "4.17.25",
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "22.19.1",
+    "@eslint/js": "10.0.1",
+    "eslint": "10.13.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
+    "vitest": "5.0.5"
+  }
+}

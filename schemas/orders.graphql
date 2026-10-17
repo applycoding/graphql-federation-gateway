@@ -1,0 +1,58 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.9"
+    import: ["@key", "@shareable"]
+  )
+
+"""
+Requires a valid JWT. The field resolves to null when the caller is anonymous.
+"""
+directive @authenticated on FIELD_DEFINITION
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+}
+
+type Order @key(fields: "id") {
+  id: ID!
+  status: OrderStatus!
+  totalCents: Int!
+  createdAt: String!
+  user: User!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+  orders(first: Int, after: String): OrderConnection @authenticated
+}
+
+type OrderEdge {
+  cursor: String!
+  node: Order!
+}
+
+type PageInfo @shareable {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type OrderConnection {
+  edges: [OrderEdge!]!
+  pageInfo: PageInfo!
+}
+
+input CreateOrderInput {
+  userId: ID!
+  totalCents: Int!
+}
+
+type Query {
+  order(id: ID!): Order
+  orders(first: Int, after: String): OrderConnection!
+}
+
+type Mutation {
+  createOrder(input: CreateOrderInput!): Order! @authenticated
+}
